@@ -1,0 +1,11 @@
+Structs vs Classes
+
+Working with structs in C made it clear how much Python hides when using classes. In C, I had to manually define everything that Python normally handles for you. This included setting up function pointers inside the struct, explicitly passing the “self” parameter into every function, and manually initializing objects through constructor-like functions. In Python, all of this is built into the language, so creating and using classes feels much more natural and readable.
+
+nheritance Implementation
+
+Inheritance in C was implemented using composition by embedding the base Character struct as the first member of the Warrior and Mage structs. This allowed me to treat derived types as if they were base types by casting pointers, which is something Python handles automatically with its inheritance system. Instead of using simple syntax like “class Warrior(Character),” I had to manually build that relationship.
+
+Understanding OOP Mechanics
+
+Function pointers inside structs enable polymorphism because they allow different objects to point to different implementations of the same function. Even though the function call looks the same, the actual behavior depends on which function pointer is assigned. This is why a Warrior and a Mage can both use “attack” but produce different outputs.

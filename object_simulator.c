@@ -31,12 +31,13 @@
 
 typedef struct Character {
     // TODO: Add data members here
-    
-    
-    
+    char name[50];
+    int health;
+    int level;
     
     // TODO: Add function pointer members here
-    
+    void (*attack)(struct Character* self);
+    void (*take_damage)(struct Character* self, int damage);
     
 } Character;
 
@@ -51,7 +52,9 @@ typedef struct Character {
 // - Accept a Character* pointer (the "self" parameter)
 // - Print: "[name] performs a basic attack!"
 // Hint: void character_attack(Character* self) { ... }
-
+void character_attack(Character* self) {
+    printf("%s performs a basic attack!\n", self->name);
+}
 
 
 
@@ -60,7 +63,10 @@ typedef struct Character {
 // - Accept a Character* pointer and an int damage
 // - Reduce the character's health by the damage amount
 // - Print: "[name] takes [damage] damage! Health: [remaining health]"
-
+void character_take_damage(Character* self, int damage) {
+    self->health -= damage;
+    printf("%s takes %d damage! Health: %d\n", self->name, damage, self->health);
+}
 
 
 
@@ -72,7 +78,14 @@ typedef struct Character {
 // - Initialize attack function pointer to character_attack
 // - Initialize take_damage function pointer to character_take_damage
 // Hint: strncpy(dest, src, size) and remember to null-terminate
-
+void character_init(Character* c, const char* name, int health, int level) {
+    strncpy(c->name, name, sizeof(c->name) - 1);
+    c->name[sizeof(c->name) - 1] = '\0'; // Ensure null-termination
+    c->health = health;
+    c->level = level;
+    c->attack = character_attack;
+    c->take_damage = character_take_damage;
+}
 
 
 
@@ -92,9 +105,10 @@ typedef struct Character {
 
 typedef struct Warrior {
     // TODO: Add Character base as first member
-    
+    Character base;
     
     // TODO: Add Warrior-specific data
+    int strength;
     
 } Warrior;
 
@@ -105,9 +119,10 @@ typedef struct Warrior {
 
 typedef struct Mage {
     // TODO: Add Character base as first member
-    
+    Character base;
     
     // TODO: Add Mage-specific data
+    int mana;
     
 } Mage;
 
@@ -123,9 +138,10 @@ typedef struct Mage {
 // - Cast the Character* to Warrior* to access warrior-specific data
 // - Print: "[name] swings sword with [strength] strength!"
 // Hint: Warrior* w = (Warrior*)self;
-
-
-
+void warrior_attack(Character* self) {
+    Warrior* w = (Warrior*)self; 
+    printf("%s swings sword with %d strength!\n", w->base.name, w->strength);
+}
 
 
 // TODO: Implement mage_attack function
@@ -135,9 +151,15 @@ typedef struct Mage {
 // - Reduce mana by 10 (cost of spell)
 // - Print: "[name] casts fireball using [mana] mana!"
 // - If mana is below 10, print: "[name] is out of mana!"
-
-
-
+void mage_attack(Character* self) {
+    Mage* m = (Mage*)self; 
+    if (m->mana >= 10) {
+        m->mana -= 10; 
+        printf("%s casts fireball using %d mana!\n", m->base.name, m->mana);
+    } else {
+        printf("%s is out of mana!\n", m->base.name);
+    }
+}
 
 
 // TODO: Implement warrior_init function (constructor)
@@ -148,10 +170,11 @@ typedef struct Mage {
 // - Override the attack function pointer to point to warrior_attack
 // Hint: To initialize base: character_init(&w->base, name, health, level);
 // Then override: w->base.attack = warrior_attack;
-
-
-
-
+void warrior_init(Warrior* w, const char* name, int health, int level, int strength) {
+    character_init(&w->base, name, health, level);
+    w->strength = strength;
+    w->base.attack = warrior_attack;
+}
 
 
 
@@ -161,10 +184,11 @@ typedef struct Mage {
 // - Initialize the base Character part using character_init
 // - Set the mana field
 // - Override the attack function pointer to point to mage_attack
-
-
-
-
+void mage_init(Mage* m, const char* name, int health, int level, int mana) {
+    character_init(&m->base, name, health, level);
+    m->mana = mana;
+    m->base.attack = mage_attack;
+}
 
 
 
@@ -186,14 +210,25 @@ int main() {
     // 6. Call the Mage's attack method multiple times (to show mana usage)
     // 7. Demonstrate polymorphism by storing different character types
     //    in an array and calling attack on each
-    
-    
-    
-    
-    
-    
-    
-    
+    character_init(&((Character){0}), "Generic Hero", 100, 1);
+    Character generic;
+    character_init(&generic, "Generic Hero", 100, 1);
+    generic.attack(&generic);
+    generic.take_damage(&generic, 20);
+
+    warrior_init(&(Warrior){0}, "Conan", 120, 10, 30);
+    Warrior conan;
+    warrior_init(&conan, "Conan", 120, 10, 30);
+    conan.base.attack(&conan.base);
+
+    mage_init(&(Mage){0}, "Gandalf", 80, 5, 50);
+    Mage gandalf;
+    mage_init(&gandalf, "Gandalf", 80, 5, 50);
+    gandalf.base.attack(&gandalf.base); 
+    gandalf.base.attack(&gandalf.base); 
+    gandalf.base.attack(&gandalf.base); 
+
+
     
     
     
